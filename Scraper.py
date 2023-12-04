@@ -50,7 +50,7 @@ def scrapeCommands():
             WebsiteContent: str = fetchWebsiteContent(url)
             soup = BeautifulSoup(WebsiteContent, 'html.parser')
             articles = soup.find_all('article')
-            articlesdata = []
+            articlesData = []
             for article in articles:
                
                articleDict = {}
@@ -58,7 +58,9 @@ def scrapeCommands():
                   if child.name is not None:
                      print(child)
                      if child.name in ["h1","h2","h3"]:
-                        articleDict["title"] = child.get_text().strip()
+                        #articleDict["title"] = child.get_text().strip()
+                        articleDict["title"] = child.contents[0].get('title').strip()
+                        
                      if 'class' in child.attrs and  any(c.lower() in child['class'] for c in ['star-rating','one','two','three','four','five']):
                         print(child.attrs)
                         articleDict['rating'] = child.attrs['class'][1]
@@ -72,17 +74,20 @@ def scrapeCommands():
                #price = article.find(find_currency_symbols)
                #articleDict["price"] = price.get_text().strip()
                articleDict["price"] = article.find(string=find_currency_string)
-               articlesdata.append(articleDict)
-            for dictArticle in articlesdata:
+               articlesData.append(articleDict)
+            for dictArticle in articlesData:
                print(dictArticle)
-            data = [li.get_text().strip() for li in soup.find_all('article')]
-            print(data[0])
+            #data = [li.get_text().strip() for li in soup.find_all('article')]
+            
+            #print(data[0])
          
-            df = pd.DataFrame(data)
+            #df = pd.DataFrame(data)
+            df = pd.DataFrame(articlesData)
             print(df)
             for column in df.columns:
                print(column)
             print(sys.stdout.encoding)
+            df.to_csv('newfile.csv', index=False)
             break
     
 def find_currency_symbols(tag):
